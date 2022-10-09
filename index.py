@@ -114,12 +114,12 @@ def loopFunction():
                 if event.type == pygame.KEYUP:
                     direction = "null"
             if direction == "left":
-                if brickCooX < 10:
+                if brickCooX < 0:
                     brickCooX = brickCooX
                 else:
                     brickCooX -= brickSpeed
             if direction == "right":
-                if brickCooX > 940:
+                if brickCooX > 900:
                     brickCooX = brickCooX
                 else:
                     brickCooX += brickSpeed
@@ -145,17 +145,37 @@ def loopFunction():
                 ballPosX += ballXMove
 
                 for i in bricks:
-                    pygame.draw.rect(screen, bricks[i]["color"], Rect(bricks[i]["posX"], bricks[i]["posY"], 100, 50))
+                    if bricks[i]["state"] == "alive":
+                        pygame.draw.rect(screen, bricks[i]["color"],
+                                         Rect(bricks[i]["posX"], bricks[i]["posY"], 100, 50))
+                    if bricks[i]["state"] == "alive" and pygame.Rect.colliderect(Rect(bricks[i]["posX"], bricks[i]["posY"], 100, 50), ballCircle):
+                        bricks[i]["state"] = "dead"
+                        ballYMove *= -1
                 if 750 < ballPosY < 755:
                     if not pygame.Rect.colliderect(brick, ballCircle):
-                        numberOfLives-=1
+                        numberOfLives -= 1
                         ballPosX = 500
                         ballPosY = 500
                         ballXMove = 0
                         ballYMove = 3
                         brickCooX = 450
                     else:
-                        print("touché")
+                        ballYMove = -3
+                        if brickCooX < ballPosX < brickCooX + 20:
+                            ballXMove = -5
+                        if brickCooX + 20 < ballPosX < brickCooX + 40:
+                            ballXMove = -2
+                        if brickCooX + 40 < ballPosX < brickCooX + 60:
+                            ballXMove = 0
+                        if brickCooX + 60 < ballPosX < brickCooX + 80:
+                            ballXMove = 2
+                        if brickCooX + 80 < ballPosX < brickCooX + 100:
+                            ballXMove = 5
+                if ballPosX < 0 or ballPosX > 990:
+                    ballXMove *= -1
+                if ballPosY < 0:
+                    ballYMove *= -1
+
                 if numberOfLives == 0:
                     gameover = True
 
