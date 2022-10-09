@@ -71,6 +71,8 @@ def loopFunction():
     bricks = {}
     bricksNumber = 70
 
+    numberOfLives = 3
+
     for i in range(bricksNumber):
         color = (randint(0, 255), randint(0, 255), randint(0, 255))
         bricks[i] = {'posX': (intervalOf10 * 100), 'posY': (row * 50) + 100, 'state': "alive", "color": color}
@@ -125,9 +127,10 @@ def loopFunction():
             if start is True:
                 screen.blit(fond, (0, 0))
 
-                screen.blit(coeur, (10, 5))
-                screen.blit(coeur, (70, 5))
-                screen.blit(coeur, (130, 5))
+                livePosX = 10
+                for x in range(numberOfLives):
+                    screen.blit(coeur, (livePosX, 5))
+                    livePosX += 60
 
                 currentScoreText = font.render('Score : ' + str(score), True, (255, 255, 255))
                 scoreText = font.render('Highest Score : ' + str(highscore), True, (255, 255, 255))
@@ -141,18 +144,22 @@ def loopFunction():
                 ballPosY += ballYMove
                 ballPosX += ballXMove
 
-
                 for i in bricks:
                     pygame.draw.rect(screen, bricks[i]["color"], Rect(bricks[i]["posX"], bricks[i]["posY"], 100, 50))
-                if 750 < ballPosY < 755 and pygame.Rect.colliderect(brick, ballCircle) == False:
-                    print("pas touché")
-                # if not atLeastOneAlive:
-                # gameover = True
+                if 750 < ballPosY < 755:
+                    if not pygame.Rect.colliderect(brick, ballCircle):
+                        numberOfLives-=1
+                        ballPosX = 500
+                        ballPosY = 500
+                        ballXMove = 0
+                        ballYMove = 3
+                        brickCooX = 450
+                    else:
+                        print("touché")
+                if numberOfLives == 0:
+                    gameover = True
 
-                ballPosYText = font.render(str(ballPosY), True, (255, 255, 255))
-                screen.blit(ballPosYText, (600, 20))
-
-        #print(pyautogui.position())
+        # print(pyautogui.position())
         clock.tick(60)
         pygame.display.flip()
 
